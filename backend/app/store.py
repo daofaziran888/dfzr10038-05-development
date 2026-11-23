@@ -4,6 +4,7 @@
 """
 from __future__ import annotations
 
+import copy
 from typing import Any
 
 from app.seed import SEED_ROWS
@@ -11,8 +12,13 @@ from app.seed import SEED_ROWS
 
 class Store:
     def __init__(self) -> None:
-        self._tables: dict[str, list[dict[str, Any]]] = {
-            name: [dict(row) for row in rows] for name, rows in SEED_ROWS.items()
+        self._tables: dict[str, list[dict[str, Any]]] = {}
+        self.reset()
+
+    def reset(self) -> None:
+        """按种子数据重建全部表；嵌套结构深拷贝，测试之间互不影响。"""
+        self._tables = {
+            name: copy.deepcopy(rows) for name, rows in SEED_ROWS.items()
         }
 
     def module_names(self) -> list[str]:
@@ -27,23 +33,25 @@ class Store:
                 return row
         return None
 
-    def overview(self) -> dict[str, object]:
-        modules: list[dict[str, object]] = []
-        for name in self.module_names():
+    def overview(self, modules: list[str] | None = None) -> dict[str, object]:
+        """运营概览；modules 限定为已注册的业务模块，内部流程表不上看板。"""
+        names = modules or self.module_names()
+        items: list[dict[str, object]] = []
+        for name in sorted(names):
             rows = self.rows(name)
-            modules.append({
+            items.append({
                 "name": name,
                 "created": len(rows),
                 "pending": sum(1 for row in rows if row.get("pending")),
                 "abnormal": sum(1 for row in rows if row.get("abnormal")),
             })
         cards = [
-            {"label": "业务模块", "value": len(modules)},
-            {"label": "今日新增", "value": sum(int(item["created"]) for item in modules)},
-            {"label": "待处理", "value": sum(int(item["pending"]) for item in modules)},
-            {"label": "异常量", "value": sum(int(item["abnormal"]) for item in modules)},
+            {"label": "业务模块", "value": len(items)},
+            {"label": "今日新增", "value": sum(int(item["created"]) for item in items)},
+            {"label": "待处理", "value": sum(int(item["pending"]) for item in items)},
+            {"label": "异常量", "value": sum(int(item["abnormal"]) for item in items)},
         ]
-        return {"cards": cards, "modules": modules}
+        return {"cards": cards, "modules": items}
 
 
 store = Store()

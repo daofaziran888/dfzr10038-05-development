@@ -20,6 +20,9 @@ from app.services.data_split import DataSplitService
 from app.services.feat_catalog import FeatCatalogService
 from app.services.quality_rule import QualityRuleService
 from app.services.label_dict import LabelDictService
+from app.services.rework_sample import ReworkSampleService
+from app.services.train_fetch import TrainFetchService
+from app.services.train_fetch_item import TrainFetchItemService
 from app.services.batch_load import BatchLoadService
 from app.services.report_task import ReportTaskService
 from app.services.schedule_job import ScheduleJobService
@@ -44,6 +47,9 @@ SERVICES: dict[str, BaseModuleService] = {
     "feat_catalog": FeatCatalogService(),
     "quality_rule": QualityRuleService(),
     "label_dict": LabelDictService(),
+    "rework_sample": ReworkSampleService(),
+    "train_fetch": TrainFetchService(),
+    "train_fetch_item": TrainFetchItemService(),
     "batch_load": BatchLoadService(),
     "report_task": ReportTaskService(),
     "schedule_job": ScheduleJobService(),

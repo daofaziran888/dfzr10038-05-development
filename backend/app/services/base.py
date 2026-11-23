@@ -44,8 +44,10 @@ class BaseModuleService:
         return store.find(self.MODULE, entry_id)
 
     def create_entry(self, values: dict[str, Any]) -> tuple[dict[str, Any] | None, list[str]]:
+        """登记新记录；返回 (记录, 错误信息列表)，登记失败时记录为 None。"""
         missing = [
-            field for field in self.REQUIRED_FIELDS
+            f"缺少必填字段：{field}"
+            for field in self.REQUIRED_FIELDS
             if not str(values.get(field) or "").strip()
         ]
         if missing:
